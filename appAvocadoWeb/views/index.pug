@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  div
+    img(class='mb-4' src='/images/avocado.png' alt='' width='144' height='144')
+  form(class='form-signin' action='/exec/createContract' method='POST') 
+    input(type='text' id='inputKey' name='dir' class='form-control' placeholder='Root public address' required autofocus)
+    button(class='btn btn-lg btn-primary btn-block' type='submit') Sign in
+
