@@ -7,6 +7,7 @@ function reqContractAdd() {
       	document.getElementById("divAnswer").innerHTML = xhttp.responseText;
     }
   };
-  xhttp.open("GET", "/getMyContract", true);
+  var x = document.getElementById("h1Address").innerHTML;
+  xhttp.open("GET", "/getMyContract/dirs/:"+x, true);
   xhttp.send();
 }

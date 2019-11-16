@@ -3,8 +3,6 @@ block content
   div
     img(class='mb-4' src='/images/avocado.png' alt='' width='144' height='144')
     div
-      h1 #{resp}
+      h1(id='h1Address') #{resp}
     div(id='divAnswer')
-    p Now execute 
-      a(href='http://localhost:3000/getMyContract') /getMyContract 
   script(src='/javascripts/reqContractAddress.js')
