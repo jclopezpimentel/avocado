@@ -8,15 +8,18 @@ var initializer = {};
 var vehiclesContracts = []; 
 
 initializer.index = function(req, res, next) {
-	mongoose.connection.db.listCollections({name: 'roots'})
-    .next(function(err, collinfo) {
-        if (collinfo) {
-        	inicializado=true;
-        	res.send("Ya se creó mandaremos otra vista");
-	    }
-	    inicializado = false;
-	 	res.render('index', { title: 'Sig-in' });   
-    });
+	try{
+		mongoose.connection.db.listCollections({name: 'roots'})
+	    .next(function(err, collinfo) {
+	        if (collinfo) {
+	        	//res.send("Ya se creó mandaremos otra vista");
+	        	res.render('login', { title: 'Sig-in' });
+		    }
+		 	res.render('index', { title: 'Create Contract' });   
+	    });
+	}catch(err){
+	 	res.render('index', { title: err });   
+	}
 
 }
 
