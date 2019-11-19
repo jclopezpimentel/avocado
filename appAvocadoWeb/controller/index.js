@@ -27,7 +27,8 @@ initializer.index = function(req, res, next) {
 initializer.getMyContract = function (req, res) {
 	console.log(vehiclesContracts);
 	var leyenda = "My contract address is: " + vehiclesContracts[0].contract._address;
-    var r = save(req,vehiclesContracts[0].contract._address);
+    //var r = save(req,vehiclesContracts[0].contract._address);
+	r=1;
 	leyenda += "<br><a href='http://localhost:3000/addManufacturers'>/addManufacturers</a>" + " and id=" + r;
     res.send(leyenda);
     res.end();
@@ -42,7 +43,21 @@ initializer.createContract = function (req, res){
 }
 
 function save(req,answer){
-	var param = {name:'root',email:'root@root.jc',addressRoot:req.params.dirId,addressContract:answer};
+	var param = {email:'root@root.jc',password:req.body.password,addressRoot:req.body.dir,addressContract:answer};
+	var root = new Root(param);
+    
+    root.save(function(err){
+        if( err ){ 
+        	console.log('Error: ', err); 
+        	return -1; 
+        }        
+        console.log("Successfully created a root. :)");
+        return root._id;
+    });
+}
+
+function save2(req,answer){
+	var param = {email:'root@root.jc',password:'root',addressRoot:req.params.dirId,addressContract:answer};
 	var root = new Root(param);
     
     root.save(function(err){
@@ -96,6 +111,7 @@ function contractCreation(req,res){
     		var i = vehiclesContracts.length;
     		var firstElement = {"publicKey": address, "contract": result};
     		vehiclesContracts[i] = firstElement;
+    		save(req,firstElement.contract._address); //add user to the database
     	});
 
     //res.send("Contract being created by: " + address + " Now execute <a href='http://localhost:3000/getMyContract'>/getMyContract</a>");
