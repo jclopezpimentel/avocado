@@ -42,7 +42,7 @@ initializer.createContract = function (req, res){
 }
 
 function save(req,answer){
-	var param = {name:'Root',apellido:'Root',addressRoot:req.params.dirId,addressContract:answer};
+	var param = {name:'root',email:'root@root.jc',addressRoot:req.params.dirId,addressContract:answer};
 	var root = new Root(param);
     
     root.save(function(err){
