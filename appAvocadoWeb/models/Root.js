@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
  
 var RootSchema = new Schema({
-    name: {type: String, required: true, max: 10},
-    apellido: {type: String, required: true, max: 10},
+    email: {type: String, required: true, max: 50},
+    password: {type: String, required: true, max: 50},
     addressRoot: {type: String, required: true, max: 200},
     addressContract: {type: String, required: true, max: 200},
 });
