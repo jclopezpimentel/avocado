@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var Root = require("../models/Root");
 
-
 var initializer = {};
 //developing a list of objects; each one with two keys: public address account and its contract
 //Initializing with empty values
@@ -9,20 +8,35 @@ var vehiclesContracts = [];
 
 initializer.index = function(req, res, next) {
 	try{
-		mongoose.connection.db.listCollections({name: 'roots'})
-	    .next(function(err, collinfo) {
+		mongoose.connection.db.listCollections({name: 'roots'}).next(function(err, collinfo) {
 	        if (collinfo) {
 	        	//res.send("Ya se creó mandaremos otra vista");
 	        	res.render('login', { title: 'Sig-in' });
 		    }
+		    //res.send(err);
 		 	res.render('index', { title: 'Create Contract' });   
 	    });
 	}catch(err){
-	 	res.render('index', { title: err });   
+		//res.send(err);
+	 	res.render('error', { message: "Check that mongodb is available", error:err}); 
 	}
 
 }
 
+
+initializer.getSmartContract = function (req, res){
+
+	//res.send(req.body.sessionID);
+	s = req.session;
+	var valor = s.sessionId;
+	if(req.body.sessionID==valor){
+		res.send("session id: " + valor);
+	}else{
+		res.send("Algo raro está pasando");
+	}
+	
+	//res.render('gral',{output:valor});
+}
 
 initializer.getMyContract = function (req, res) {
 	console.log(vehiclesContracts);
