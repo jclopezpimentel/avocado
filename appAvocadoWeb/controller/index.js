@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var Root = require("../models/Root");
 
-
 var initializer = {};
 //developing a list of objects; each one with two keys: public address account and its contract
 //Initializing with empty values
@@ -9,25 +8,41 @@ var vehiclesContracts = [];
 
 initializer.index = function(req, res, next) {
 	try{
-		mongoose.connection.db.listCollections({name: 'roots'})
-	    .next(function(err, collinfo) {
+		mongoose.connection.db.listCollections({name: 'roots'}).next(function(err, collinfo) {
 	        if (collinfo) {
 	        	//res.send("Ya se creó mandaremos otra vista");
 	        	res.render('login', { title: 'Sig-in' });
 		    }
+		    //res.send(err);
 		 	res.render('index', { title: 'Create Contract' });   
 	    });
 	}catch(err){
-	 	res.render('index', { title: err });   
+		//res.send(err);
+	 	res.render('error', { message: "Check that mongodb is available", error:err}); 
 	}
 
 }
 
 
+initializer.getSmartContract = function (req, res){
+
+	//res.send(req.body.sessionID);
+	s = req.session;
+	var valor = s.sessionId;
+	if(req.body.sessionID==valor){
+		res.send("session id: " + valor);
+	}else{
+		res.send("Algo raro está pasando");
+	}
+	
+	//res.render('gral',{output:valor});
+}
+
 initializer.getMyContract = function (req, res) {
 	console.log(vehiclesContracts);
 	var leyenda = "My contract address is: " + vehiclesContracts[0].contract._address;
-    var r = save(req,vehiclesContracts[0].contract._address);
+    //var r = save(req,vehiclesContracts[0].contract._address);
+	r=1;
 	leyenda += "<br><a href='http://localhost:3000/addManufacturers'>/addManufacturers</a>" + " and id=" + r;
     res.send(leyenda);
     res.end();
@@ -42,7 +57,21 @@ initializer.createContract = function (req, res){
 }
 
 function save(req,answer){
-	var param = {name:'Root',apellido:'Root',addressRoot:req.params.dirId,addressContract:answer};
+	var param = {email:'root@root.jc',password:req.body.password,addressRoot:req.body.dir,addressContract:answer};
+	var root = new Root(param);
+    
+    root.save(function(err){
+        if( err ){ 
+        	console.log('Error: ', err); 
+        	return -1; 
+        }        
+        console.log("Successfully created a root. :)");
+        return root._id;
+    });
+}
+
+function save2(req,answer){
+	var param = {email:'root@root.jc',password:'root',addressRoot:req.params.dirId,addressContract:answer};
 	var root = new Root(param);
     
     root.save(function(err){
@@ -96,6 +125,7 @@ function contractCreation(req,res){
     		var i = vehiclesContracts.length;
     		var firstElement = {"publicKey": address, "contract": result};
     		vehiclesContracts[i] = firstElement;
+    		save(req,firstElement.contract._address); //add user to the database
     	});
 
     //res.send("Contract being created by: " + address + " Now execute <a href='http://localhost:3000/getMyContract'>/getMyContract</a>");

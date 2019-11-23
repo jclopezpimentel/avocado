@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 Root #{output}
+  button(onclick='findSmartContractDetail();') Smart Contract Details
+  div(id='divSmartContract' sesid=ssid)
+  a(href='/') index
+  script(src='/javascripts/getSmartContract.js')
+
+  br
