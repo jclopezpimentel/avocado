@@ -4,7 +4,10 @@ var Root = require("../models/Root");
 var initializer = {};
 //developing a list of objects; each one with two keys: public address account and its contract
 //Initializing with empty values
-var vehiclesContracts = []; 
+
+//var vehiclesContracts = []; 
+var receiptG;
+
 
 initializer.index = function(req, res, next) {
 	try{
@@ -39,8 +42,11 @@ initializer.getSmartContract = function (req, res){
 }
 
 initializer.getMyContract = function (req, res) {
-	console.log(vehiclesContracts);
-	var leyenda = "My contract address is: " + vehiclesContracts[0].contract._address;
+	//console.log(vehiclesContracts);
+	console.log(receiptG);
+	//var leyenda = "My contract address is: " + vehiclesContracts[0].contract._address;
+	var leyenda = "The receive address is: " + receiptG.transactionHash + "<br>";
+	leyenda += "The contract address is: " + receiptG.contractAddress + "<br>";
     //var r = save(req,vehiclesContracts[0].contract._address);
 	r=1;
 	leyenda += "<br><a href='http://localhost:3000/addManufacturers'>/addManufacturers</a>" + " and id=" + r;
@@ -118,15 +124,20 @@ function contractCreation(req,res){
 	var web3 = new Web3(Web3.givenProvider || "ws://localhost:7545");
 
 	vehicleContract = new web3.eth.Contract(vehContract);
-	//address = "0x9B5482c2281988aF7b928fCB034338C198AdCCAd";
+	//address = "0x9ec815Ef8f3E8B3d922C3c57308b1D7C3f2aE91f";
 	address = req.body.dir; //obtaining public key account
-    vehicleContract.deploy({data: byteCodeVeh}).send({from: address, gas: 4700000}).then(
+    vehicleContract.deploy({data: byteCodeVeh}).send({from: address, gas: 4700000}).on('receipt', function(receipt){
+     	receiptG = receipt;
+     	save(req,receiptG.contractAddress); //add user to the database
+     }).on('error', console.error);
+
+    /*.then(
     	function(result){
     		var i = vehiclesContracts.length;
     		var firstElement = {"publicKey": address, "contract": result};
     		vehiclesContracts[i] = firstElement;
     		save(req,firstElement.contract._address); //add user to the database
-    	});
+    	});*/
 
     //res.send("Contract being created by: " + address + " Now execute <a href='http://localhost:3000/getMyContract'>/getMyContract</a>");
 
