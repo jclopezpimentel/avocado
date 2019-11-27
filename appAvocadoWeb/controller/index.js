@@ -27,31 +27,22 @@ initializer.index = function(req, res, next) {
 }
 
 
-initializer.getSmartContract = function (req, res){
-
-	//res.send(req.body.sessionID);
-	s = req.session;
-	var valor = s.sessionId;
-	if(req.body.sessionID==valor){
-		res.send("session id: " + valor);
-	}else{
-		res.send("Algo raro está pasando");
-	}
-	
-	//res.render('gral',{output:valor});
-}
-
 initializer.getMyContract = function (req, res) {
 	//console.log(vehiclesContracts);
 	console.log(receiptG);
+	var leyenda = dataContract(); 
+    res.send(leyenda);
+    res.end();
+}
+
+function dataContract(){
 	//var leyenda = "My contract address is: " + vehiclesContracts[0].contract._address;
 	var leyenda = "The receive address is: " + receiptG.transactionHash + "<br>";
 	leyenda += "The contract address is: " + receiptG.contractAddress + "<br>";
     //var r = save(req,vehiclesContracts[0].contract._address);
 	r=1;
 	leyenda += "<br><a href='http://localhost:3000/addManufacturers'>/addManufacturers</a>" + " and id=" + r;
-    res.send(leyenda);
-    res.end();
+	return leyenda;
 }
 
 
@@ -62,8 +53,8 @@ initializer.createContract = function (req, res){
    	res.render('contractCreated', { resp: answer });
 }
 
-function save(req,answer){
-	var param = {email:'root@root.jc',password:req.body.password,addressRoot:req.body.dir,addressContract:answer};
+function save(req,addrC,addrT){
+	var param = {email:'root@root.jc',password:req.body.password,addressRoot:req.body.dir,addressContract:addrC,addressTransaction:addrC};
 	var root = new Root(param);
     
     root.save(function(err){

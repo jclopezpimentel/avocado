@@ -6,6 +6,7 @@ var RootSchema = new Schema({
     password: {type: String, required: true, max: 50},
     addressRoot: {type: String, required: true, max: 200},
     addressContract: {type: String, required: true, max: 200},
+    addressTransaction: {type: String, required: true, max: 200},
 });
 
 //Example about models

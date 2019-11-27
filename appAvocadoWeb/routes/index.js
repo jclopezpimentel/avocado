@@ -25,7 +25,7 @@ router.post('/exec/createContract', function (req, res, next){
 router.get('/', contr.index);
 //router.get('/getMyContract/dirs/:dirId', contr.getMyContract);
 router.get('/getMyContract', contr.getMyContract);
-router.post('/getSmartContract', contr.getSmartContract);
+router.post('/getSmartContract', us.getSmartContract);
 router.post('/exec/createContract', contr.createContract);
 router.post('/exec/authenticate', us.login);
 
