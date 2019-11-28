@@ -35,6 +35,7 @@ function loguear(req,res,word){
         		res.render('gral',{output:'Authentication was not succesful'});	
         	}
         }
+        res.render('gral',{output:'Authentication was not succesful, more roots than required'}); 
     });
 }
 

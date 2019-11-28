@@ -12,12 +12,17 @@ var receiptG;
 initializer.index = function(req, res, next) {
 	try{
 		mongoose.connection.db.listCollections({name: 'roots'}).next(function(err, collinfo) {
+	        if(err){
+	        	//Hay un error
+	        	res.render('error', { message: 'Hay un error', error:err });
+	        }
 	        if (collinfo) {
-	        	//res.send("Ya se creó mandaremos otra vista");
+	        	//Ya se creó mandaremos otra vista
 	        	res.render('login', { title: 'Sig-in' });
+		    }else{
+			    //No se ha creado la configuración inicial
+			 	res.render('index', { title: 'Create Contract' });   
 		    }
-		    //res.send(err);
-		 	res.render('index', { title: 'Create Contract' });   
 	    });
 	}catch(err){
 		//res.send(err);
@@ -49,14 +54,26 @@ function dataContract(){
 // only methods with respect to solidity and web3
 
 initializer.createContract = function (req, res){
-	var answer = contractCreation(req,res);
-   	res.render('contractCreated', { resp: answer });
+	//Considerar variables estáticas por el número de peticiones
+	var rootEmail = 'root@root.jc';
+	Root.find({email:rootEmail}).exec(function(err, users){
+        if(users.length>0)
+        { 
+        	console.log("Root must not be created again:)");
+		   	res.render('contractCreated', { resp: 'Contract ya había sido creado' });
+        }else{
+			var answer = contractCreation(req,res);
+		   	res.render('contractCreated', { resp: answer });
+        }
+    });		
+
 }
 
 function save(req,addrC,addrT){
-	var param = {email:'root@root.jc',password:req.body.password,addressRoot:req.body.dir,addressContract:addrC,addressTransaction:addrC};
+	var rootEmail = 'root@root.jc';
+	var param = {email:rootEmail,password:req.body.password,addressRoot:req.body.dir,addressContract:addrC,addressTransaction:addrC};
 	var root = new Root(param);
-    
+		    
     root.save(function(err){
         if( err ){ 
         	console.log('Error: ', err); 
@@ -67,6 +84,8 @@ function save(req,addrC,addrT){
     });
 }
 
+
+/*
 function save2(req,answer){
 	var param = {email:'root@root.jc',password:'root',addressRoot:req.params.dirId,addressContract:answer};
 	var root = new Root(param);
@@ -80,7 +99,7 @@ function save2(req,answer){
         return root._id;
     });
 }
-
+*/
 
 function contractCreation(req,res){
 	compiler = require('solc');
