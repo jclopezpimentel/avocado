@@ -114,17 +114,16 @@ function save2(req,answer){
 function contractCreation(req,res){
 	compiler = require('solc');
 	const fs = require('fs'); 
-	const avocadoSol = 'Avocado.sol';
-	sourceCode = fs.readFileSync(avocadoSol, 'UTF8').toString();
+	sourceCode = fs.readFileSync('Vehicles.sol', 'UTF8').toString();
 	const path = require('path');	
 	const solc = require('solc');
-	const veh = path.resolve('', '', avocadoSol);
+	const veh = path.resolve('', '', 'Vehicles.sol');
 	const source = fs.readFileSync(veh, 'UTF-8');
 	
 	var input = {
 	    language: 'Solidity',
 	    sources: {
-	        avocadoSol : {
+	        'Vehicles.sol' : {
 	            content: source
 	        }
 	    },
@@ -138,16 +137,16 @@ function contractCreation(req,res){
 	}; 
 	compiledCode = JSON.parse(solc.compile(JSON.stringify(input)));
 	contracts = compiledCode.contracts;
-	avoContract = contracts.avocadoSol.Avocado.abi; //it depends of the Contract name
-	byteCodeVeh = contracts.avocadoSol.Avocado.evm.bytecode.object; //it depends of the Contract name
+	vehContract = contracts['Vehicles.sol'].Vehicles.abi;
+	byteCodeVeh = contracts['Vehicles.sol'].Vehicles.evm.bytecode.object;
 
 	var Web3 = require('web3');
 	var web3 = new Web3(Web3.givenProvider || "ws://localhost:7545");
 
-	avocadoContract = new web3.eth.Contract(avoContract);
+	vehicleContract = new web3.eth.Contract(vehContract);
 	//address = "0x9ec815Ef8f3E8B3d922C3c57308b1D7C3f2aE91f";
 	address = req.body.dir; //obtaining public key account
-    avocadoContract.deploy({data: byteCodeVeh}).send({from: address, gas: 4700000}).on('receipt', function(receipt){
+    vehicleContract.deploy({data: byteCodeVeh}).send({from: address, gas: 4700000}).on('receipt', function(receipt){
      	receiptG = receipt;
      	save(req,receiptG.contractAddress); //add user to the database
      }).on('error', console.error);
