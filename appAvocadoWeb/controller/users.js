@@ -66,8 +66,8 @@ function findContract(word,res){
         if(users.length===1){
             var addressC= users[0].addressContract;
             var addressT= users[0].addressTransaction;
-            var leyenda = "The receive address is: " + addressC + "\n";
-            leyenda += "The contract address is: " + addressT;
+            var leyenda = "The contract address is: " + addressC + "\n";
+            leyenda += "The transaction address is: " + addressT;
             //return leyenda;
         }else{
             leyenda = "Something wrong is happening!";

@@ -42,7 +42,7 @@ initializer.getMyContract = function (req, res) {
 
 function dataContract(){
 	//var leyenda = "My contract address is: " + vehiclesContracts[0].contract._address;
-	var leyenda = "The receive address is: " + receiptG.transactionHash + "<br>";
+	var leyenda = "The transaction address is: " + receiptG.transactionHash + "<br>";
 	leyenda += "The contract address is: " + receiptG.contractAddress + "<br>";
     //var r = save(req,vehiclesContracts[0].contract._address);
 	r=1;
@@ -78,9 +78,27 @@ initializer.createContract = function (req, res){
 
 }
 
+initializer.createAdmor = function (req, res){
+	var addressR = req.body.addressR;
+	Root.find({addressRoot:addressR}).exec(function(err, users){
+		if(err){
+			res.send("Hubo un error");
+		}
+        if(users.length>0)
+        { 
+        	addAdmor(req, res, users[0].addressContract);
+        }else{
+		   	res.render('contractCreated', { resp: 'Colocaste un address root does not validate' });
+        } 
+    });		
+	
+	//res.send(addressR);
+	//res.end();
+}
+
 function save(req,addrC,addrT){
 	var rootEmail = 'root@root.jc';
-	var param = {email:rootEmail,password:req.body.password,addressRoot:req.body.dir,addressContract:addrC,addressTransaction:addrC};
+	var param = {email:rootEmail,password:req.body.password,addressRoot:req.body.dir,addressContract:addrC,addressTransaction:addrT};
 	var root = new Root(param);
 		    
     root.save(function(err){
@@ -95,21 +113,7 @@ function save(req,addrC,addrT){
 }
 
 
-/*
-function save2(req,answer){
-	var param = {email:'root@root.jc',password:'root',addressRoot:req.params.dirId,addressContract:answer};
-	var root = new Root(param);
-    
-    root.save(function(err){
-        if( err ){ 
-        	console.log('Error: ', err); 
-        	return -1; 
-        }        
-        console.log("Successfully created a root. :)");
-        return root._id;
-    });
-}
-*/
+
 
 function contractCreation(req,res){
 	compiler = require('solc');
@@ -149,7 +153,7 @@ function contractCreation(req,res){
 	address = req.body.dir; //obtaining public key account
     avocadoContract.deploy({data: byteCodeVeh}).send({from: address, gas: 4700000}).on('receipt', function(receipt){
      	receiptG = receipt;
-     	save(req,receiptG.contractAddress); //add user to the database
+     	save(req,receiptG.contractAddress,receiptG.transactionHash); //add user to the database
      }).on('error', console.error);
 
     /*.then(
@@ -167,6 +171,59 @@ function contractCreation(req,res){
     return address;
 }
 
+
+//functions to process incoming requests
+function addAdmor(req, res, addressContract) {
+	var reply='';
+
+	address2 = req.body.addressA;
+	address = req.body.addressR;
+
+	compiler = require('solc');
+	const fs = require('fs'); 
+	const avocadoSol = 'Avocado.sol';
+	sourceCode = fs.readFileSync(avocadoSol, 'UTF8').toString();
+	const path = require('path');	
+	const solc = require('solc');
+	const veh = path.resolve('', '', avocadoSol);
+	const source = fs.readFileSync(veh, 'UTF-8');
+	
+	var input = {
+	    language: 'Solidity',
+	    sources: {
+	        avocadoSol : {
+	            content: source
+	        }
+	    },
+	    settings: {
+	        outputSelection: {
+	            '*': {
+	                '*': [ '*' ]
+	            }
+	        }
+	    }
+	}; 
+	compiledCode = JSON.parse(solc.compile(JSON.stringify(input)));
+	contracts = compiledCode.contracts;
+	avoContract = contracts.avocadoSol.Avocado.abi; //it depends of the Contract name
+
+	//avoContract = contracts['Vehicles.sol'].Vehicles.abi;
+	
+	var Web3 = require('web3');
+	var web3 = new Web3(Web3.givenProvider || "ws://localhost:7545");
+
+
+		//Se crea el objecto avocadoContract, una vez que ya creamos el contrato
+		//Para ello es necesario la variable avoContract que es la que contiene el parámetro ABI y
+		//La dirección del contrato, la cuál recuperamos de la variable creada después de hacer el deploy
+	var avocadoContract = new web3.eth.Contract(avoContract, addressContract);
+	avocadoContract.methods.addAdmor(address2).send({from: address,gas: 4700000}).then(console.log);
+
+	reply += "Your name is" + req.body.name;
+	reply += "Admor address added is" + address2;
+	reply += "Agregaste un administrador <a href='http://localhost:3000/frontRegistryVehicle'>/frontRegistryVehicle</a>";
+	res.render('gral', { output: reply });
+}
 
 
 module.exports = initializer;

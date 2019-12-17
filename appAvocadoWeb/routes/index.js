@@ -28,6 +28,8 @@ router.get('/getMyContract', contr.getMyContract);
 router.post('/getSmartContract', us.getSmartContract);
 router.post('/exec/createContract', contr.createContract);
 router.post('/exec/authenticate', us.login);
+router.post('/exec/addA', contr.createAdmor);
+
 
 
 module.exports = router;
