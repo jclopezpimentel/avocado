@@ -2,7 +2,7 @@ pragma solidity ^0.5.9;
 
 contract Avocado{
     address root;
-    address[] admors;
+    mapping (address=> address) admors;
 
     constructor() public{
         root = msg.sender;
@@ -10,26 +10,37 @@ contract Avocado{
 
     function addAdmor(address k) public{
         require(msg.sender == root);
-        admors.push(k);
+        admors[k] = k;
     }
     
-/*    function addUser(address k, string memory T) public{
-        require(admor.exists(msg.sender));
-        user.put(k,T);
+    mapping (address=> address) readers;
+    function addReader(address k) public{
+        require(admors[msg.sender] == msg.sender);
+        readers[k] = k;
     }
-    
-    function setData(address k, string memory D) public returns(uint) {
-        require(user.exists(msg.sender));
-        require(user.permits(k);
-        I=data.put(k,D);
-        return I;
+
+    mapping (address=> address) writers;
+    function addWriter(address k) public{
+        require(admors[msg.sender] == msg.sender);
+        writers[k] = k;
     }
-    
-    function getData(address k, string memory I) view public returns(string memory){
-        require(data.find(I,k) and data.permits(I,k));
-        D = data.get(I,k);
+
+    string[] data;
+    function setData(string memory d)  public returns(uint) {
+        require(writers[msg.sender] == msg.sender);
+        data.push(d);
+        return (data.length-1);
+    }
+
+    function getData(uint id) view public returns(string memory){
+        require(readers[msg.sender] == msg.sender);
+        string memory D;
+        if((id>=0) && id<data.length){
+            D = data[id];
+        }else{
+            D="";
+        }
         return D;
     }
-*/
 }
 
