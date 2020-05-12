@@ -49,7 +49,9 @@ app.use(function(err, req, res, next) {
 var mongoose = require('mongoose');
 var mongoDB = 'mongodb://127.0.0.1:27017/mydb';
 
-mongoose.connect(mongoDB);
+mongoose.connect(mongoDB,{
+  useUnifiedTopology: true,
+  useNewUrlParser: true});
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));

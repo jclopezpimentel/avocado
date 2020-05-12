@@ -7,6 +7,7 @@ var RootSchema = new Schema({
     addressRoot: {type: String, required: true, max: 200},
     addressContract: {type: String, required: true, max: 200},
     addressTransaction: {type: String, required: true, max: 200},
+    status: {type: String, required: true, max: 100},//"rootCreation"
 });
 
 //Example about models

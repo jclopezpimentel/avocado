@@ -1,4 +1,4 @@
-pragma solidity ^0.5.9;
+pragma solidity ^0.6.2;
 
 contract Avocado{
     address root;
