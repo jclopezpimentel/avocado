@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var error = require("../controller/errors");
 
 
 var initializer = {};
@@ -13,7 +14,7 @@ initializer.index = function(req, res, next) {
 		mongoose.connection.db.listCollections({name: 'roots'}).next(function(err, collinfo) {
 	        if(err){
 	        	//Hay un error
-	        	res.render('error', { message: 'Hay un error', error:err });
+	        	res.render('error', { message: error.error(52), error:err });
 	        }
 	        if (collinfo) {
 	        	//Ya se creó mandaremos otra vista
@@ -25,7 +26,7 @@ initializer.index = function(req, res, next) {
 	    });
 	}catch(err){
 		//res.send(err);
-	 	res.render('error', { message: "Check that mongodb is available", error:err}); 
+	 	res.render('error', { message: error.error(51), error:err}); 
 	}
 
 }

@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var RootSchema = new Schema({
     email: {type: String, required: true, max: 50},
     password: {type: String, required: true, max: 50},
-    addressRoot: {type: String, required: true, max: 200},
+    addressU: {type: String, required: true, max: 200},
     addressContract: {type: String, required: true, max: 200},
     addressTransaction: {type: String, required: true, max: 200},
     status: {type: String, required: true, max: 100},//"rootCreation"

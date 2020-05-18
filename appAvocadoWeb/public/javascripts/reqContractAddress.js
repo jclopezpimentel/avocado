@@ -1,4 +1,4 @@
-document.getElementById("body").onload = function() {reqContractAdd()};
+//document.getElementById("body").onload = function() {reqContractAdd()};
 
 function reqContractAdd() {
   var xhttp = new XMLHttpRequest();

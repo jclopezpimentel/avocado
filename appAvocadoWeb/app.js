@@ -43,7 +43,9 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  var resp = {result:"error"};
+  res.send(resp);
+  //res.render('error');
 });
 
 var mongoose = require('mongoose');
