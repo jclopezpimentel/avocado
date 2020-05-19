@@ -1,6 +1,3 @@
-var mongoose = require('mongoose');
-var Root = require("../models/Root");
-var error = require("../controller/errors");
 var initializer = {};
 
 

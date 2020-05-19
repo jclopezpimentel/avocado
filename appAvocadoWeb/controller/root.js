@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var Root = require("../models/Root");
+var User = require("../models/Users");
 var error = require("../controller/errors");
 var initializer = {};
 
@@ -29,7 +29,7 @@ function someFieldIsEmpty(ob){
 initializer.getAddContrR = function (par,resp) {	
 	var r=someFieldIsEmpty(par);
 	if (r==0){
-		Root.find({status:statusV}).exec(function(err, users){
+		User.find({status:statusV}).exec(function(err, users){
 			if(err){
 				resp.send(error.jsonResp(50));
 				r=50;
@@ -60,7 +60,7 @@ initializer.getAddContrR = function (par,resp) {
 initializer.getAddTransR = function (par,resp) {	
 	var r=someFieldIsEmpty(par);
 	if (r==0){
-		Root.find({status:statusV}).exec(function(err, users){
+		User.find({status:statusV}).exec(function(err, users){
 			if(err){
 				resp.send(error.jsonResp(50));
 				r=50;
@@ -97,7 +97,7 @@ function save(req,addrC,addrT, statusp,resp){
 					addressContract:addrC,
 					addressTransaction:addrT,
 					status:statusp};
-	var root = new Root(param);
+	var root = new User(param);
 		    
     root.save(function(err){
         if( err ){ 
@@ -181,7 +181,7 @@ function checkMutualExclusion(req,resp){
 	var res=0;
 	if(candado){ //only one thread must intro in this part
 		candado = false; 
-		Root.find({status:statusV}).exec(function(err, users){
+		User.find({status:statusV}).exec(function(err, users){
 			if(err){
 				candado = true;
 				resp.send(error.jsonResp(53)); 
@@ -272,7 +272,7 @@ function addAdmor(req, res, addressContract) {
 
 initializer.createAdmor = function (req, res){
 	var addressR = req.body.addressR;
-	Root.find({addressU:addressR}).exec(function(err, users){
+	User.find({addressU:addressR}).exec(function(err, users){
 		if(err){
 			res.send("Hubo un error");
 		}

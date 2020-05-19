@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
-var Root = require("../models/Root");
+var Root = require("../models/Users");
 
 
 var initializer = {};
 
+/*
 
 initializer.login = function(req, res) {
 	email = req.body.email;
@@ -78,5 +79,5 @@ function findContract(word,res){
     //return "Something wrong is happening 2!";
 }
 
-
+*/
 module.exports = initializer;
