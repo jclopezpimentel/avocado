@@ -1,22 +1,23 @@
 var mongoose = require('mongoose');
 var User = require("../models/Users");
 var error = require("../controller/errors");
+var result = require("../controller/result");
 var initializer = {};
 
 //recepitG is a json that includes  all data about the root transaction
 var receiptG;
 var candado =true;
-var statusV = "rootCreation";
+var statusV = {rootCreation:"rootCreation",
+			   admorCreation:"admorCreationInRootSC"};
+var blockchainAddress = "ws://localhost:7545";
 
 
 function someFieldIsEmpty(ob){
 	var obj = ob.body;
 	var n = Object.keys(obj).length;
-
 	for(var i=0;i<n;i++){
 		var field=Object.keys(obj)[i];
 		var fieldV= obj[field];
-		console.log(fieldV);
 		if(fieldV==""){
 			return 10;
 		}
@@ -29,7 +30,7 @@ function someFieldIsEmpty(ob){
 initializer.getAddContrR = function (par,resp) {	
 	var r=someFieldIsEmpty(par);
 	if (r==0){
-		User.find({status:statusV}).exec(function(err, users){
+		User.find({status:statusV.rootCreation}).exec(function(err, users){
 			if(err){
 				resp.send(error.jsonResp(50));
 				r=50;
@@ -38,10 +39,7 @@ initializer.getAddContrR = function (par,resp) {
 	        { 
 	        	if(par.body.email==users[0].email && par.body.pass==users[0].password){
 	        		res = users[0].addressContract;
-       				var obj ={
-						AddressContract: res
-						};        
-        			resp.send(obj);;
+        			resp.send(result.jsonResp(2,res));
         			r=0;
 	        	}else{
 	        		r = 4;
@@ -60,7 +58,7 @@ initializer.getAddContrR = function (par,resp) {
 initializer.getAddTransR = function (par,resp) {	
 	var r=someFieldIsEmpty(par);
 	if (r==0){
-		User.find({status:statusV}).exec(function(err, users){
+		User.find({status:statusV.rootCreation}).exec(function(err, users){
 			if(err){
 				resp.send(error.jsonResp(50));
 				r=50;
@@ -69,10 +67,7 @@ initializer.getAddTransR = function (par,resp) {
 	        { 
 	        	if(par.body.email==users[0].email && par.body.pass==users[0].password){
 	        		res = users[0].addressTransaction;
-       				var obj ={
-						addressTransaction: res
-						};        
-        			resp.send(obj);;
+        			resp.send(result.jsonResp(3,res));
         			r=0;
 	        	}else{
 	        		r = 4;
@@ -97,19 +92,16 @@ function save(req,addrC,addrT, statusp,resp){
 					addressContract:addrC,
 					addressTransaction:addrT,
 					status:statusp};
-	var root = new User(param);
+	var user = new User(param);
 		    
-    root.save(function(err){
+    user.save(function(err){
         if( err ){ 
         	candado = true;
         	resp.send(error.jsonResp(50)); 
+        }else{
+	        candado =true; //lock liberated  
+	        resp.send(result.jsonResp(1,user._id));;
         }
-        console.log("Successfully created a root. :)");
-        candado =true; //lock liberated
-		var obj ={
-				result: "Root created with address:" + param.addressU
-			};        
-        resp.send(obj);;
     });
 }
 
@@ -145,12 +137,11 @@ function createRootSC(req,resp){
 	avoContract = contracts.rootSol.RootSC.abi; //it depends of the Contract name
 	byteCodeVeh = contracts.rootSol.RootSC.evm.bytecode.object; //it depends of the Contract name
 
-	//address = "0x9ec815Ef8f3E8B3d922C3c57308b1D7C3f2aE91f";
 	address = req.body.addressU; //obtaining public key account
 	var resultado = 0;
 	try{
 		var Web3 = require('web3');
-		var web3 = new Web3(Web3.givenProvider || "ws://localhost:7545");
+		var web3 = new Web3(Web3.givenProvider || blockchainAddress);
 
 		rootContract = new web3.eth.Contract(avoContract);
 	    rootContract.deploy({data: byteCodeVeh}).send({from: address, gas: 4700000
@@ -163,10 +154,9 @@ function createRootSC(req,resp){
 	    	})
 	    	.on('receipt', function(receipt){
 	     		receiptG = receipt;
-	     	save(req,receiptG.contractAddress,receiptG.transactionHash,statusV,resp); //add user to the database
+	     	save(req,receiptG.contractAddress,receiptG.transactionHash,statusV.rootCreation,resp); //add user to the database
 	     }).on('error', console.error); 
 	}catch(err){
-		console.log(err.message);
 		resultado = 60;
 	}
 
@@ -177,11 +167,10 @@ function createRootSC(req,resp){
 
 function checkMutualExclusion(req,resp){
 	//Considerar variables estáticas por el número de peticiones
-	console.log("El valor de candado es: "+ candado);
 	var res=0;
 	if(candado){ //only one thread must intro in this part
 		candado = false; 
-		User.find({status:statusV}).exec(function(err, users){
+		User.find({status:statusV.rootCreation}).exec(function(err, users){
 			if(err){
 				candado = true;
 				resp.send(error.jsonResp(53)); 
@@ -210,33 +199,43 @@ initializer.Root=function(req,res){
 		var resp = checkMutualExclusion(req,res);
 		return resp;
 	}else{
-		return (10);
+		return (r);
 	}
 }
 
 
+function saveAdmor(req,addrC,addrT, statusp,resp){
+	var param = {	email:req.body.email,
+					password:req.body.password,
+					addressU:req.body.addressR,
+					addressContract:addrC,
+					addressTransaction:addrT,
+					status:statusp};
+	var user = new User(param);
+    user.save(function(err){
+        if( err ){ 
+        	resp.send(error.jsonResp(50)); 
+        }else{
+	        resp.send(result.jsonResp(4,user._id));;
+        }
+    });
+}
 
-
-//functions to process incoming requests
-function addAdmor(req, res, addressContract) {
-	var reply='';
-
-	address2 = req.body.addressA;
-	address = req.body.addressR;
-
+function createAdmorSC(req,res){
+	//createAdmorSC involves create Admor in database and add it within the root knowledge
 	compiler = require('solc');
 	const fs = require('fs'); 
-	const avocadoSol = 'Avocado.sol';
-	sourceCode = fs.readFileSync(avocadoSol, 'UTF8').toString();
+	const rootSol = 'RootSC.sol';
+	sourceCode = fs.readFileSync(rootSol, 'UTF8').toString();
 	const path = require('path');	
 	const solc = require('solc');
-	const veh = path.resolve('', '', avocadoSol);
+	const veh = path.resolve('', '', rootSol);
 	const source = fs.readFileSync(veh, 'UTF-8');
 	
 	var input = {
 	    language: 'Solidity',
 	    sources: {
-	        avocadoSol : {
+	        rootSol : {
 	            content: source
 	        }
 	    },
@@ -250,42 +249,52 @@ function addAdmor(req, res, addressContract) {
 	}; 
 	compiledCode = JSON.parse(solc.compile(JSON.stringify(input)));
 	contracts = compiledCode.contracts;
-	avoContract = contracts.avocadoSol.Avocado.abi; //it depends of the Contract name
+	rContract = contracts.rootSol.RootSC.abi; //it depends of the Contract name
+	byteCodeVeh = contracts.rootSol.RootSC.evm.bytecode.object; //it depends of the Contract name
 
-	//avoContract = contracts['Vehicles.sol'].Vehicles.abi;
-	
-	var Web3 = require('web3');
-	var web3 = new Web3(Web3.givenProvider || "ws://localhost:7545");
+	addressA = req.body.addressA; //obtain Administrator address
+	addressR = req.body.addressR; //obtain root address
+	addressContract = req.body.addressContract; //obtain Contract Address of the root
 
+	var resultado = 0;
+	try{
+		var Web3 = require('web3');
+		var web3 = new Web3(Web3.givenProvider || blockchainAddress);
 
-		//Se crea el objecto avocadoContract, una vez que ya creamos el contrato
-		//Para ello es necesario la variable avoContract que es la que contiene el parámetro ABI y
-		//La dirección del contrato, la cuál recuperamos de la variable creada después de hacer el deploy
-	var avocadoContract = new web3.eth.Contract(avoContract, addressContract);
-	avocadoContract.methods.addAdmor(address2).send({from: address,gas: 4700000}).then(console.log);
+		//Adding Administrator in the blockchain*******************************
+		//Object rootContract is created from abi template and the contract address
+		var rootContract = new web3.eth.Contract(rContract, addressContract);
+		rootContract.methods.addAdmor(addressA).send({from: addressR,gas: 4700000}, 
+			function(err, transactionHash){
+	    		if(err){
+        			res.send(error.jsonResp(60));
+        			return 60;
+	    		}
+	    	})
+	    	.on('receipt', function(receipt){
+	     		receiptG = receipt;//Getting the receipt of the transaction
+	     		saveAdmor(req,"No contract address in this transaction",receiptG.transactionHash,statusV.admorCreation,res); //add user to the database
+	     	}).on('error', console.error);
+	     //*********************************************************************
+	}catch(err){
+		resultado = 60;
+	}
 
-	reply += "Your name is" + req.body.name;
-	reply += "Admor address added is" + address2;
-	reply += "Agregaste un administrador <a href='http://localhost:3000/frontRegistryVehicle'>/frontRegistryVehicle</a>";
-	res.render('gral', { output: reply });
+    return resultado;
 }
 
-initializer.createAdmor = function (req, res){
-	var addressR = req.body.addressR;
-	User.find({addressU:addressR}).exec(function(err, users){
-		if(err){
-			res.send("Hubo un error");
-		}
-        if(users.length>0)
-        { 
-        	addAdmor(req, res, users[0].addressContract);
-        }else{
-		   	res.render('contractCreated', { resp: 'Colocaste un address root does not validate' });
-        } 
-    });		
-	
-	//res.send(addressR);
-	//res.end();
+
+//Create an administrator
+initializer.AddAdmor=function(req,res){
+	//We evaluate if some of the parameters are empty
+	//In case, return an error	
+	var r=someFieldIsEmpty(req);
+	if (r==0){
+			var answer = createAdmorSC(req,res);
+			r = answer;	
+		
+	}
+	return r;
 }
 
 

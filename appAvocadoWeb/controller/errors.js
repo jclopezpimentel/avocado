@@ -26,7 +26,8 @@ function answer(codigo){
 
 initializer.jsonResp = function (codigo) {
 	var resp ={
-		result: answer(codigo)
+		result: "Error",
+		Explanation:answer(codigo)
 	};
 	return resp;
 }
