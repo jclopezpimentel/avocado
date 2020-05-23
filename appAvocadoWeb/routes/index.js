@@ -5,6 +5,7 @@ var main = require('../controller/index.js');
 var modelRoot = require('../controller/modelRoot.js');
 var restRoot = require('../controller/restRoot.js');
 var restAdmor = require('../controller/restAdmor.js');
+var token = require('../controller/restToken.js');
 var us = require('../controller/users.js');
 /* GET home page. */
 
@@ -47,7 +48,7 @@ router.post('/exec/admorConstructor', restAdmor.createAdmor);
 //************************************************
 //************************************************
 //routes returning some model
-router.get('/', main.index);
+//router.get('/', main.index);
 //router.post('/exec/rootConstructorM', modelRoot.createRoot); // returns a model about root created
 //router.post('/exec/authenticate', us.login);
 

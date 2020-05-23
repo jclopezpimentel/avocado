@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var User = require("../models/Users");
-var error = require("../controller/errors");
-var result = require("../controller/result");
+var error = require("../controller/errResulUtils");
+var result = require("../controller/errResulUtils");
 var initializer = {};
 
 //recepitG is a json that includes  all data about the root transaction
@@ -12,34 +12,21 @@ var statusV = {rootCreation:"rootCreation",
 var blockchainAddress = "ws://localhost:7545";
 
 
-function someFieldIsEmpty(ob){
-	var obj = ob.body;
-	var n = Object.keys(obj).length;
-	for(var i=0;i<n;i++){
-		var field=Object.keys(obj)[i];
-		var fieldV= obj[field];
-		if(fieldV==""){
-			return 10;
-		}
-	}
-	return 0;
-	
-}
 
 
 initializer.getAddContrR = function (par,resp) {	
-	var r=someFieldIsEmpty(par);
+	var r=result.someFieldIsEmpty(par);
 	if (r==0){
 		User.find({status:statusV.rootCreation}).exec(function(err, users){
 			if(err){
-				resp.send(error.jsonResp(50));
+				resp.send(error.jsonRespError(50));
 				r=50;
 			}
 	        if(users.length>0 && users.length<2)
 	        { 
 	        	if(par.body.email==users[0].email && par.body.pass==users[0].password){
 	        		res = users[0].addressContract;
-        			resp.send(result.jsonResp(2,res));
+        			resp.send(result.jsonRespOK(2,res));
         			r=0;
 	        	}else{
 	        		r = 4;
@@ -56,18 +43,18 @@ initializer.getAddContrR = function (par,resp) {
 }
 
 initializer.getAddTransR = function (par,resp) {	
-	var r=someFieldIsEmpty(par);
+	var r=result.someFieldIsEmpty(par);
 	if (r==0){
 		User.find({status:statusV.rootCreation}).exec(function(err, users){
 			if(err){
-				resp.send(error.jsonResp(50));
+				resp.send(error.jsonRespError(50));
 				r=50;
 			}
 	        if(users.length>0 && users.length<2)
 	        { 
 	        	if(par.body.email==users[0].email && par.body.pass==users[0].password){
 	        		res = users[0].addressTransaction;
-        			resp.send(result.jsonResp(3,res));
+        			resp.send(result.jsonRespOK(3,res));
         			r=0;
 	        	}else{
 	        		r = 4;
@@ -97,10 +84,10 @@ function save(req,addrC,addrT, statusp,resp){
     user.save(function(err){
         if( err ){ 
         	candado = true;
-        	resp.send(error.jsonResp(50)); 
+        	resp.send(error.jsonRespError(50)); 
         }else{
 	        candado =true; //lock liberated  
-	        resp.send(result.jsonResp(1,user._id));;
+	        resp.send(result.jsonRespOK(1,user._id));;
         }
     });
 }
@@ -148,7 +135,7 @@ function createRootSC(req,resp){
 	    	}, function(err, transactionHash){
 	    		if(err){
 	    			candado = true;
-        			resp.send(error.jsonResp(60));
+        			resp.send(error.jsonRespError(60));
         			return 60;
 	    		}
 	    	})
@@ -173,12 +160,12 @@ function checkMutualExclusion(req,resp){
 		User.find({status:statusV.rootCreation}).exec(function(err, users){
 			if(err){
 				candado = true;
-				resp.send(error.jsonResp(53)); 
+				resp.send(error.jsonRespError(53)); 
 			}
 	        if(users.length>0)
 	        { 
 	        	candado = true;
-			   	resp.send(error.jsonResp(1)); 
+			   	resp.send(error.jsonRespError(1)); 
 	        }else{
 				var answer = createRootSC(req,resp);
 				res = answer;	
@@ -194,7 +181,7 @@ function checkMutualExclusion(req,resp){
 initializer.Root=function(req,res){
 	//We evaluate if some of the parameters are empty
 	//In case, return an error	
-	var r=someFieldIsEmpty(req);
+	var r=result.someFieldIsEmpty(req);
 	if (r==0){
 		var resp = checkMutualExclusion(req,res);
 		return resp;
@@ -214,9 +201,9 @@ function saveAdmor(req,addrC,addrT, statusp,resp){
 	var user = new User(param);
     user.save(function(err){
         if( err ){ 
-        	resp.send(error.jsonResp(50)); 
+        	resp.send(error.jsonRespError(50)); 
         }else{
-	        resp.send(result.jsonResp(4,user._id));;
+	        resp.send(result.jsonRespOK(4,user._id));;
         }
     });
 }
@@ -288,7 +275,7 @@ function createAdmorSC(req,res){
 initializer.AddAdmor=function(req,res){
 	//We evaluate if some of the parameters are empty
 	//In case, return an error	
-	var r=someFieldIsEmpty(req);
+	var r=result.someFieldIsEmpty(req);
 	if (r==0){
 			var answer = createAdmorSC(req,res);
 			r = answer;	

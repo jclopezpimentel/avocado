@@ -1,7 +1,37 @@
 var initializer = {};
 
 
-function answer(codigo){
+function answerResult(codigo){
+	switch(codigo){
+		case 1: res="Root id created ";break;
+		case 2: res="Smart Contract address";break;
+		case 3: res="Transaction address";break;
+		case 4: res="Administrator id created in Root Smart Contract";break;
+		default: res="Not Explanation";
+	}
+	return res;	
+}
+
+
+initializer.jsonRespOK = function (codigo) {
+	var resp ={
+		result: "Success",
+		Explanation:answerResult(codigo)
+	};
+	return resp;
+}
+
+
+initializer.jsonRespOK = function (codigo,res) {
+	var resp ={
+		result: res,
+		Explanation:answerResult(codigo)
+	};
+	return resp;
+}
+
+
+function answerError(codigo){
 	switch(codigo){
 		//Errors between 1 to 10 corresponds to Root creation
 		//case 0 is not an error
@@ -24,16 +54,33 @@ function answer(codigo){
 }
 
 
-initializer.jsonResp = function (codigo) {
+initializer.jsonRespError = function (codigo) {
 	var resp ={
 		result: "Error",
-		Explanation:answer(codigo)
+		Explanation:answerError(codigo)
 	};
 	return resp;
 }
 
 
 initializer.error = function (codigo) {
-	return answer(codigo);
+	return answerError(codigo);
 }
+
+initializer.someFieldIsEmpty = function(ob){
+	var obj = ob.body;
+	var n = Object.keys(obj).length;
+	for(var i=0;i<n;i++){
+		var field=Object.keys(obj)[i];
+		var fieldV= obj[field];
+		if(fieldV==""){
+			return 10;
+		}
+	}
+	return 0;
+	
+}
+
+
+
 module.exports = initializer;

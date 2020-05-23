@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var error = require("../controller/errors");
+//var error = require("../controller/errors");
 
 
 var initializer = {};
