@@ -5,7 +5,7 @@ var main = require('../controller/index.js');
 var modelRoot = require('../controller/modelRoot.js');
 var restRoot = require('../controller/restRoot.js');
 var restAdmor = require('../controller/restAdmor.js');
-var token = require('../controller/restToken.js');
+var restToken = require('../controller/restToken.js');
 var us = require('../controller/users.js');
 /* GET home page. */
 
@@ -34,6 +34,12 @@ router.post('/exec/createContract', function (req, res, next){
 //************************************************
 //ROUTES FOR RESTFUL REQUESTS
 //************************************************
+//TOKEN
+//************************************************
+router.post('/exec/getToken', restToken.createToken);
+router.post('/exec/isValid', restToken.isValid);
+//************************************************
+
 //ROOT
 router.post('/exec/rootConstructor', restRoot.createRoot); 
 router.post('/exec/getAddContrR', restRoot.getAddContrR);

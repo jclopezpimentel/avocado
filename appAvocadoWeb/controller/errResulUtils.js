@@ -7,6 +7,9 @@ function answerResult(codigo){
 		case 2: res="Smart Contract address";break;
 		case 3: res="Transaction address";break;
 		case 4: res="Administrator id created in Root Smart Contract";break;
+		case 10: res="Token generated";break;
+		case 11: res="Token is valid";break;
+		case 12: res="Token no valid";break;
 		default: res="Not Explanation";
 	}
 	return res;	
@@ -48,7 +51,7 @@ function answerError(codigo){
 		case 53: res="Error " + codigo + ": query problems"; break;
 		//Errors related with blockchain connection
 		case 60: res="Error " + codigo + ": problem accesing to the blockchain";break;
-		default: res="Error " + codigo + ": Unkown error";
+		default: res="Error " + codigo + ": Unkown";
 	}
 	return res;	
 }
