@@ -94,7 +94,7 @@ function isStillFresch(creation,life,cDate){
 }
 
 
-initializer.isValid=function(tok,res){
+function isValid(tok,res){
 	var retorno=0;
 	var param={token:tok};
 	//Check if token exists in the database
@@ -109,13 +109,17 @@ initializer.isValid=function(tok,res){
        		life = tokens[0].life;
        		var dateC = getToday();//Calculate current date
 	       	var r=isStillFresch(creation,life,dateC); //Evaluate if current date wrt creationg and life is still valid
-	     	res.send(errResulUtils.jsonRespOK(11,r)); 
-	     		
+	       	if (r==false) res.send(errResulUtils.jsonRespOK(12,r)); 	
+	       	else res.send(errResulUtils.jsonRespOK(11,r)); 
         }else{			
 			res.send(errResulUtils.jsonRespOK(12,false)); 
         }
     });
-	return retorno;
+	return retorno;	
+}
+
+initializer.isValidTempo=function(tok,res){
+	return isValid(tok,res);
 }
 
 module.exports = initializer;

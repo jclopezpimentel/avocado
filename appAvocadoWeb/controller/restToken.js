@@ -23,7 +23,7 @@ initializer.createToken = function (req, res){
 
 initializer.isValid = function (req, res){
 	var tok=req.query.token;
-	var answerCode = token.isValid(tok,res);
+	var answerCode = token.isValidTempo(tok,res);
 	if(answerCode!=0){ 
 		//it means that an error has happened
 		//These erros are controlled when not callback functions are implemented yet 
