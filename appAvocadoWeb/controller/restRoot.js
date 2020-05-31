@@ -24,43 +24,15 @@ initializer.createRoot = function (req, res){
 
 
 initializer.getAddContrR = function (req, res){
-	var email=req.query.email;
-	var pass=req.query.pass;	
-	var obj={body:{email:email,
-					pass:pass
-				  }
-			};
-
-	var answerCode = root.getAddContrR(obj,res);
-	
-	if(answerCode!=0){ 
-		//it means that an error has happened
-		//These erros are controlled when not callback functions are implemented yet 
-		res.send(error.jsonRespError(answerCode)); //error code is sent as an answer
-	}else{//it means that an error number 0 happened, it is out our reach
-		//res.send("Root created with address:" + addressU);
-	}
-
+	var token=req.query.token;	
+	var obj={body:{token:token}};
+	root.getAddContrR(obj,res);
 }
 
 initializer.getAddTransR = function (req, res){
-	var email=req.query.email;
-	var pass=req.query.pass;	
-	var obj={body:{email:email,
-					pass:pass
-				  }
-			};
-
-	var answerCode = root.getAddTransR(obj,res);
-	
-	if(answerCode!=0){ 
-		//it means that an error has happened
-		//These erros are controlled when not callback functions are implemented yet 
-		res.send(error.jsonRespError(answerCode)); //error code is sent as an answer
-	}else{//it means that an error number 0 happened, it is out our reach
-		//res.send("Root created with address:" + addressU);
-	}
-
+	var token=req.query.token;	
+	var obj={body:{token:token}};
+	root.getAddTransR(obj,res);
 }
 
 

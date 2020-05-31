@@ -3,6 +3,7 @@ var User = require("../models/Users");
 var User_ = require("../controller/users");
 var error = require("../controller/errResulUtils");
 var result = require("../controller/errResulUtils");
+var Token = require("../controller/token");
 var initializer = {};
 
 //recepitG is a json that includes  all data about the root transaction
@@ -15,60 +16,66 @@ var blockchainAddress = "ws://localhost:7545";
 
 
 
-initializer.getAddContrR = function (par,resp) {	
-	var r=result.someFieldIsEmpty(par);
+initializer.getAddContrR = function (par,resp) {
+	var r=result.someFieldIsEmpty(par);	
 	if (r==0){
-		User.find({status:statusV.rootCreation}).exec(function(err, users){
-			if(err){
-				resp.send(error.jsonRespError(50));
-				r=50;
+		var tok=par.body.token;
+		Token.whoP(tok,function(email){
+			if(email==""){
+				res.send(error.jsonRespError(70));
+			}else{
+					User.find({status:statusV.rootCreation}).exec(function(err, users){
+						if(err){
+							resp.send(error.jsonRespError(50));
+						}
+				        if(users.length>0 && users.length<2){ 
+				        	if(email==users[0].email){ //we check that the token match with the root
+				        		res = users[0].addressContract;
+			        			resp.send(result.jsonRespOK(2,res));
+		        			}else{
+	        					resp.send(error.jsonRespError(4));
+	        				}
+				        }else{			
+							resp.send(error.jsonRespError(100));
+				        } 
+				    });
 			}
-	        if(users.length>0 && users.length<2)
-	        { 
-	        	if(par.body.email==users[0].email && par.body.pass==users[0].password){
-	        		res = users[0].addressContract;
-        			resp.send(result.jsonRespOK(2,res));
-        			r=0;
-	        	}else{
-	        		r = 4;
-	        	}
-	        	
-	        }else{			
-				r = 3;
-	        } 
-	    });
+		});
 	}else{
-		return r;
+		res.send(error.jsonRespError(r));
 	}
-	return r;
 }
 
+
+
 initializer.getAddTransR = function (par,resp) {	
-	var r=result.someFieldIsEmpty(par);
+	var r=result.someFieldIsEmpty(par);	
 	if (r==0){
-		User.find({status:statusV.rootCreation}).exec(function(err, users){
-			if(err){
-				resp.send(error.jsonRespError(50));
-				r=50;
+		var tok=par.body.token;
+		Token.whoP(tok,function(email){
+			if(email==""){
+				res.send(error.jsonRespError(70));
+			}else{
+					User.find({status:statusV.rootCreation}).exec(function(err, users){
+						if(err){
+							resp.send(error.jsonRespError(50));
+						}
+				        if(users.length>0 && users.length<2){ 
+				        	if(email==users[0].email){ //we check that the token match with the root
+				        		res = users[0].addressTransaction;
+			        			resp.send(result.jsonRespOK(3,res));
+		        			}else{
+	        					resp.send(error.jsonRespError(4));
+	        				}
+				        }else{			
+							resp.send(error.jsonRespError(100));
+				        } 
+				    });
 			}
-	        if(users.length>0 && users.length<2)
-	        { 
-	        	if(par.body.email==users[0].email && par.body.pass==users[0].password){
-	        		res = users[0].addressTransaction;
-        			resp.send(result.jsonRespOK(3,res));
-        			r=0;
-	        	}else{
-	        		r = 4;
-	        	}
-	        	
-	        }else{			
-				r = 3;
-	        } 
-	    });
+		});
 	}else{
-		return r;
+		res.send(error.jsonRespError(r));
 	}
-	return r;
 }
 
 /*

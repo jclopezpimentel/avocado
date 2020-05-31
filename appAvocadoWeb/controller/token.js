@@ -152,8 +152,14 @@ initializer.whoPublic=function(token,res){
 			res.send(errResulUtils.jsonRespOK(13,resultado));
 		}
 	});
-
 }
+
+initializer.whoP=function(token,fn){
+	who(token,function(resultado){
+			fn(resultado);
+	});
+}
+
 
 
 module.exports = initializer;
