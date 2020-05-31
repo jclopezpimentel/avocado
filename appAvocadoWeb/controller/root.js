@@ -1,5 +1,6 @@
-var mongoose = require('mongoose');
+//var mongoose = require('mongoose');
 var User = require("../models/Users");
+var User_ = require("../controller/users");
 var error = require("../controller/errResulUtils");
 var result = require("../controller/errResulUtils");
 var initializer = {};
@@ -70,7 +71,7 @@ initializer.getAddTransR = function (par,resp) {
 	return r;
 }
 
-
+/*
 //Save root in database
 function save(req,addrC,addrT, statusp,resp){
 	var param = {	email:req.body.email,
@@ -91,6 +92,8 @@ function save(req,addrC,addrT, statusp,resp){
         }
     });
 }
+*/
+
 
 //save root in the smart contract
 function createRootSC(req,resp){
@@ -141,7 +144,7 @@ function createRootSC(req,resp){
 	    	})
 	    	.on('receipt', function(receipt){
 	     		receiptG = receipt;
-	     	save(req,receiptG.contractAddress,receiptG.transactionHash,statusV.rootCreation,resp); //add user to the database
+	     	User_.save(req,receiptG.contractAddress,receiptG.transactionHash,statusV.rootCreation,resp,1); //add user to the database
 	     }).on('error', console.error); 
 	}catch(err){
 		resultado = 60;
@@ -190,7 +193,7 @@ initializer.Root=function(req,res){
 	}
 }
 
-
+/*
 function saveAdmor(req,addrC,addrT, statusp,resp){
 	var param = {	email:req.body.email,
 					password:req.body.password,
@@ -207,6 +210,7 @@ function saveAdmor(req,addrC,addrT, statusp,resp){
         }
     });
 }
+*/
 
 function createAdmorSC(req,res){
 	//createAdmorSC involves create Admor in database and add it within the root knowledge
@@ -260,7 +264,8 @@ function createAdmorSC(req,res){
 	    	})
 	    	.on('receipt', function(receipt){
 	     		receiptG = receipt;//Getting the receipt of the transaction
-	     		saveAdmor(req,"No contract address in this transaction",receiptG.transactionHash,statusV.admorCreation,res); //add user to the database
+	     		User_.save(req,"No contract address in this transaction",receiptG.transactionHash,statusV.admorCreation,res,4); //add user to the database
+	     		candado=true;
 	     	}).on('error', console.error);
 	     //*********************************************************************
 	}catch(err){

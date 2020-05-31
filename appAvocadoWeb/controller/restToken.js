@@ -10,7 +10,6 @@ initializer.createToken = function (req, res){
 					password:password
 				  }
 			};
-	//console.log(obj);
 	var answerCode = token.Token(obj,res);
 	if(answerCode!=0){ 
 		//it means that an error has happened
@@ -23,16 +22,13 @@ initializer.createToken = function (req, res){
 
 initializer.isValid = function (req, res){
 	var tok=req.query.token;
-	var answerCode = token.isValidTempo(tok,res);
-	if(answerCode!=0){ 
-		//it means that an error has happened
-		//These erros are controlled when not callback functions are implemented yet 
-		res.send(error.jsonRespError(answerCode)); //error code is sent as an answer
-	}else{//it means that an error number 0 happened, it is out our reach
-		//res.send("Root created with address:" + addressU);
-	}
+	token.isValidTempo(tok,res);
 }
 
+initializer.who = function (req, res){
+	var tok=req.query.token;
+	token.whoPublic(tok,res);
+}
 
 
 module.exports = initializer;

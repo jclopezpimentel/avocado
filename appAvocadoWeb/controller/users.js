@@ -1,83 +1,26 @@
-var mongoose = require('mongoose');
-var Root = require("../models/Users");
+var User = require("../models/Users");
 
 
 var initializer = {};
-
-/*
-
-initializer.login = function(req, res) {
-	email = req.body.email;
-	var word = "root@root.jc"; 
-	if(email===word){
-		loguear(req,res,word);
-		//if(r===false){
-		//	res.render('gral',{output:'Usuario colocó password incorrecto'});
-		//}
-	}else{
-		res.render('gral',{output:'Validar autentificación de usuario'});
-	}
-}
+//Save root in database
 
 
-function loguear(req,res,word){
-	Root.find({email:word}).exec(function(err, users){
+initializer.save = function (req,addrC,addrT, statusp,resp,who) {
+    var param = {   email:req.body.email,
+                    password:req.body.password,
+                    addressU:req.body.addressU,
+                    addressContract:addrC,
+                    addressTransaction:addrT,
+                    status:statusp};
+    var user = new User(param);
+            
+    user.save(function(err){
         if( err ){ 
-        	console.log('Error: ', err); 
-			res.render('error',{message: "Something wrong is happening!", error:err});
-        }
-        if(users.length===1){
-        	if(req.body.password===users[0].password){
-        		sessionId = (Math.random()*10000)+1;
-                req.session.sessionId = sessionId; 
-                
-        		res.render('rootOptions',{ output:'authentificado', ssid:req.session.sessionId});
-        	}else{
-        		res.render('gral',{output:'Authentication was not succesful'});	
-        	}
-        }
-        res.render('gral',{output:'Authentication was not succesful, more roots than required'}); 
-    });
-}
-
-
-initializer.getSmartContract = function (req, res){
-
-    //res.send(req.body.sessionID);
-    s = req.session;
-    var valor = s.sessionId;
-    var leyenda;
-    if(req.body.sessionID==valor){
-        findContract("root@root.jc",res); 
-    }else{
-        leyenda = "session: " + valor + ";" + "body.sessionID: " + req.body.sessionID;
-        res.render('gralAjaxRes',{ output:leyenda});
-    }
-    //res.send(leyenda);
-    
-}
-
-function findContract(word,res){
-    var leyenda;
-    Root.find({email:word}).exec(function(err, users){
-        if( err ){ 
-            console.log('Error: ', err); 
-            return "Something wrong is happening!";
-        }
-        if(users.length===1){
-            var addressC= users[0].addressContract;
-            var addressT= users[0].addressTransaction;
-            var leyenda = "The contract address is: " + addressC + "\n";
-            leyenda += "The transaction address is: " + addressT;
-            //return leyenda;
+            resp.send(error.jsonRespError(50)); 
         }else{
-            leyenda = "Something wrong is happening!";
+            resp.send(result.jsonRespOK(who,user._id));;
         }
-        res.render('gralAjaxRes',{ output:leyenda});
-
-    });
-    //return "Something wrong is happening 2!";
+    });    
 }
 
-*/
 module.exports = initializer;

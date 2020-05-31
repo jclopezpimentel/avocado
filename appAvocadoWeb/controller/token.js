@@ -83,9 +83,6 @@ function isStillFresch(creation,life,cDate){
 	const origin = Date.parse(creation);
 	var originPlusLife = parseInt(origin) + (parseInt(life)*1000); //it must be multiplicated for 1000 because miliseconds
 	const now = parseInt(Date.parse(cDate));
-   console.log(origin);
-   console.log(originPlusLife);
-   console.log(now);
 	if(now<=originPlusLife){
 		return true;
 	}else{
@@ -94,14 +91,35 @@ function isStillFresch(creation,life,cDate){
 }
 
 
-function isValid(tok,res){
-	var retorno=0;
+//returns through callback function creator email or empty
+function who(tok,fn){
+	isValid(tok,function(resultado){
+		if(resultado){
+			var param={token:tok};
+			//Find the token in the database
+			Token.find(param).exec(function(err, tokens){
+				if(err){
+					fn("");
+				}
+		        if(tokens.length==1){
+		        	//Consult who is the creator
+		       		fn(tokens[0].email);
+			     }
+		    });
+		}else{
+			fn("");
+		}
+	});
+}
+
+
+//returns through callback function true or false
+function isValid(tok,fn){
 	var param={token:tok};
 	//Check if token exists in the database
-	
 	Token.find(param).exec(function(err, tokens){
-		if(err){
-			res.send(errResulUtils.jsonRespError(50));
+		if(err || (tokens.length==0)){
+			fn(false);
 		}
         if(tokens.length==1){
         	//Consult creation and life en seconds
@@ -109,17 +127,33 @@ function isValid(tok,res){
        		life = tokens[0].life;
        		var dateC = getToday();//Calculate current date
 	       	var r=isStillFresch(creation,life,dateC); //Evaluate if current date wrt creationg and life is still valid
-	       	if (r==false) res.send(errResulUtils.jsonRespOK(12,r)); 	
-	       	else res.send(errResulUtils.jsonRespOK(11,r)); 
-        }else{			
-			res.send(errResulUtils.jsonRespOK(12,false)); 
-        }
+	       	fn(r);
+	     }
     });
-	return retorno;	
 }
 
-initializer.isValidTempo=function(tok,res){
-	return isValid(tok,res);
+
+initializer.isValidTempo=function(token,res){	
+	isValid(token,function(resultado){
+		if(resultado){
+			res.send(errResulUtils.jsonRespOK(11,resultado));
+		}else{
+			res.send(errResulUtils.jsonRespOK(12,resultado));
+		}
+	});
 }
+
+
+initializer.whoPublic=function(token,res){
+	who(token,function(resultado){
+		if(resultado==""){
+			res.send(errResulUtils.jsonRespError(70));
+		}else{
+			res.send(errResulUtils.jsonRespOK(13,resultado));
+		}
+	});
+
+}
+
 
 module.exports = initializer;
