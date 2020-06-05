@@ -1,5 +1,5 @@
 var User = require("../models/Users");
-
+var errResulUtils = require("../controller/errResulUtils");
 
 var initializer = {};
 //Save root in database
@@ -11,14 +11,16 @@ initializer.save = function (req,addrC,addrT, statusp,resp,who) {
                     addressU:req.body.addressU,
                     addressContract:addrC,
                     addressTransaction:addrT,
-                    status:statusp};
+                    status:statusp,
+                    token:String(req.body.token)};
+    console.log(String(req.body.token));                    
     var user = new User(param);
             
     user.save(function(err){
         if( err ){ 
-            resp.send(error.jsonRespError(50)); 
+            resp.send(errResulUtils.jsonRespError(50)); 
         }else{
-            resp.send(result.jsonRespOK(who,user._id));;
+            resp.send(errResulUtils.jsonRespOK(who,user._id));;
         }
     });    
 }

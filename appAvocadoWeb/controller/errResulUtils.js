@@ -45,6 +45,10 @@ function answerError(codigo){
 		case 4: res="Error " + codigo + ": it is necessary to be a root for this request";break;
 		//Errors respect to parameters
 		case 10: res="Error " + codigo + ": some parameteres are empty";break;
+
+		//Errors with respect to administrator
+		case 20: res="Error " + codigo + ": the email for the administrator was already used";break;		
+		case 21: res="Error " + codigo + ": the address for the administrator was already used";break;		
 		//Errors respect to database conection
 		case 50: res="Error " + codigo + ": problem accesing to the database";break;
 		case 51: res="Error " + codigo + ": Check that mongodb is available";break;

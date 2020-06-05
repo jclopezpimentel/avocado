@@ -103,7 +103,9 @@ function who(tok,fn){
 				}
 		        if(tokens.length==1){
 		        	//Consult who is the creator
-		       		fn(tokens[0].email);
+		        	var answer = {	email:tokens[0].email,
+                    				token:tokens[0].token};
+		       		fn(answer);
 			     }
 		    });
 		}else{

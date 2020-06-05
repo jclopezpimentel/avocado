@@ -8,6 +8,7 @@ var UserSchema = new Schema({
     addressContract: {type: String, required: true, max: 200},
     addressTransaction: {type: String, required: true, max: 200},
     status: {type: String, required: true, max: 100},//"rootCreation","admorCreation"
+    token:{type: String, required: true, max: 50}
 });
 
 //Example about models

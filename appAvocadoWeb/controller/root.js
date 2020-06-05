@@ -20,16 +20,16 @@ initializer.getAddContrR = function (par,resp) {
 	var r=result.someFieldIsEmpty(par);	
 	if (r==0){
 		var tok=par.body.token;
-		Token.whoP(tok,function(email){
-			if(email==""){
-				res.send(error.jsonRespError(70));
+		Token.whoP(tok,function(answer){
+			if(answer.email==""){
+				resp.send(error.jsonRespError(70));
 			}else{
 					User.find({status:statusV.rootCreation}).exec(function(err, users){
 						if(err){
 							resp.send(error.jsonRespError(50));
 						}
 				        if(users.length>0 && users.length<2){ 
-				        	if(email==users[0].email){ //we check that the token match with the root
+				        	if(answer.email==users[0].email){ //we check that the token match with the root
 				        		res = users[0].addressContract;
 			        			resp.send(result.jsonRespOK(2,res));
 		        			}else{
@@ -52,8 +52,8 @@ initializer.getAddTransR = function (par,resp) {
 	var r=result.someFieldIsEmpty(par);	
 	if (r==0){
 		var tok=par.body.token;
-		Token.whoP(tok,function(email){
-			if(email==""){
+		Token.whoP(tok,function(answer){
+			if(answer.email==""){
 				res.send(error.jsonRespError(70));
 			}else{
 					User.find({status:statusV.rootCreation}).exec(function(err, users){
@@ -61,7 +61,7 @@ initializer.getAddTransR = function (par,resp) {
 							resp.send(error.jsonRespError(50));
 						}
 				        if(users.length>0 && users.length<2){ 
-				        	if(email==users[0].email){ //we check that the token match with the root
+				        	if(answer.email==users[0].email){ //we check that the token match with the root
 				        		res = users[0].addressTransaction;
 			        			resp.send(result.jsonRespOK(3,res));
 		        			}else{
@@ -77,29 +77,6 @@ initializer.getAddTransR = function (par,resp) {
 		res.send(error.jsonRespError(r));
 	}
 }
-
-/*
-//Save root in database
-function save(req,addrC,addrT, statusp,resp){
-	var param = {	email:req.body.email,
-					password:req.body.password,
-					addressU:req.body.addressU,
-					addressContract:addrC,
-					addressTransaction:addrT,
-					status:statusp};
-	var user = new User(param);
-		    
-    user.save(function(err){
-        if( err ){ 
-        	candado = true;
-        	resp.send(error.jsonRespError(50)); 
-        }else{
-	        candado =true; //lock liberated  
-	        resp.send(result.jsonRespOK(1,user._id));;
-        }
-    });
-}
-*/
 
 
 //save root in the smart contract
@@ -200,24 +177,6 @@ initializer.Root=function(req,res){
 	}
 }
 
-/*
-function saveAdmor(req,addrC,addrT, statusp,resp){
-	var param = {	email:req.body.email,
-					password:req.body.password,
-					addressU:req.body.addressR,
-					addressContract:addrC,
-					addressTransaction:addrT,
-					status:statusp};
-	var user = new User(param);
-    user.save(function(err){
-        if( err ){ 
-        	resp.send(error.jsonRespError(50)); 
-        }else{
-	        resp.send(result.jsonRespOK(4,user._id));;
-        }
-    });
-}
-*/
 
 function createAdmorSC(req,res){
 	//createAdmorSC involves create Admor in database and add it within the root knowledge
@@ -250,7 +209,7 @@ function createAdmorSC(req,res){
 	rContract = contracts.rootSol.RootSC.abi; //it depends of the Contract name
 	byteCodeVeh = contracts.rootSol.RootSC.evm.bytecode.object; //it depends of the Contract name
 
-	addressA = req.body.addressA; //obtain Administrator address
+	addressA = req.body.addressU; //obtain Administrator address
 	addressR = req.body.addressR; //obtain root address
 	addressContract = req.body.addressContract; //obtain Contract Address of the root
 
@@ -283,17 +242,77 @@ function createAdmorSC(req,res){
 }
 
 
+function getRegister(regS,tok,fn){		
+		Token.whoP(tok,function(answer){
+			if(answer.email==""){
+				fn("");
+			}else{
+				regS.email = answer.email;
+				User.find(regS).exec(function(err, users){
+					if(err){
+						fn("");
+					}
+			        if(users.length>0 && users.length<2){ 
+			        	if(answer.email==users[0].email){ //we check that the token user match with the search
+			        		res = users[0].addressContract;		        			
+	        				var answerR = {	email:users[0].email,
+			                    				addressU:users[0].addressU,
+			                    				addressContract:users[0].addressContract,
+							                    addressTransaction:users[0].addressTransaction,
+			                    				status:users[0].status,
+			                    				token:users[0].token};
+		                    fn(answerR);
+	        			}else{
+	        					fn("");
+        				}
+			        }else{			
+						fn("");
+			        } 
+			    });
+			}
+		});
+}
+
 //Create an administrator
 initializer.AddAdmor=function(req,res){
 	//We evaluate if some of the parameters are empty
 	//In case, return an error	
 	var r=result.someFieldIsEmpty(req);
-	if (r==0){
-			var answer = createAdmorSC(req,res);
-			r = answer;	
-		
+	if (r==0){		
+		//First, we must verify that token is linked with the root
+		//To do tat, we are going to form an objet with the search
+		var search = {email:"",
+					  status:statusV.rootCreation};
+		getRegister(search,req.body.token,function(resultado){
+			if(resultado==""){
+				res.send(error.jsonRespError(4)); //error code is sent as an answer
+			}else{				
+				//Avoid that an existence administrator can be duplicated in offchain
+				var searchEmail = {email:req.body.email};
+				User.find(searchEmail).exec(function(err, users){
+					if(err || users.length>0){
+						res.send(error.jsonRespError(20)); //error code is sent as an answer
+					}else{
+						var searchA = {addressU:req.body.addressU};
+						User.find(searchA).exec(function(err, users){
+							if(err || users.length>0){
+								res.send(error.jsonRespError(21)); //error code is sent as an answer
+							}else{
+								//then we must obtain the root address
+								req.body.addressR = resultado.addressU;
+								//and the smart contract address
+								req.body.addressContract = resultado.addressContract;
+								//With all ingredients, we can create the AdmorSC
+								var answer = createAdmorSC(req,res);
+							}						
+						});						
+					}
+				});
+			}
+		});
+	}else{
+		res.send(error.jsonRespError(r)); //error code is sent as an answer
 	}
-	return r;
 }
 
 

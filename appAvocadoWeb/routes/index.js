@@ -38,7 +38,7 @@ router.post('/exec/createContract', function (req, res, next){
 //************************************************
 router.post('/exec/getToken', restToken.createToken);
 //router.post('/exec/isValid', restToken.isValid); //not token public is available
-//router.post('/exec/who', restToken.who); //not token public is available
+router.post('/exec/who', restToken.who); //not token public is available
 //************************************************
 
 //ROOT
