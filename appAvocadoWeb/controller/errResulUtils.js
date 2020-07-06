@@ -48,7 +48,10 @@ function answerError(codigo){
 
 		//Errors with respect to administrator
 		case 20: res="Error " + codigo + ": the email for the administrator was already used";break;		
-		case 21: res="Error " + codigo + ": the address for the administrator was already used";break;		
+		case 21: res="Error " + codigo + ": the address for the administrator was already used";break;	
+
+		//Errors with respect to users
+		case 30: res="Error " + codigo + ": user does not exit";break;	
 		//Errors respect to database conection
 		case 50: res="Error " + codigo + ": problem accesing to the database";break;
 		case 51: res="Error " + codigo + ": Check that mongodb is available";break;

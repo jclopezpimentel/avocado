@@ -51,14 +51,13 @@ function checkUserInDataBase(req,res){
 		
 		User.find(param).exec(function(err, users){
 			if(err){
-				res.send(error.jsonRespError(50));
+				res.send(errResulUtils.jsonRespError(50));
 			}
 	        if(users.length>0 && users.length<2){	        	
         		token = generateToken();
         		saveTokenInDatabase(req,res,token);       			
-       			r=0;	        	
 	        }else{			
-				r = 3;
+				res.send(errResulUtils.jsonRespError(30));
 	        } 
 	    });
 
@@ -72,8 +71,7 @@ initializer.Token=function(req,res){
 	
 	if (r==0){
 			checkUserInDataBase(req,res);
-			r = 0;	//it is callback in database, error control must be controlled previouslly
-		
+			r=0;//it is callback in database, error control must be controlled previouslly		
 	}
 	return r;
 }
